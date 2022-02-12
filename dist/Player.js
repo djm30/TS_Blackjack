@@ -16,9 +16,9 @@ class User {
         };
         this.getStatus = () => {
             switch (true) {
-                case (this.value > 21):
+                case this.value > 21:
                     return Status_1.Status.Lost;
-                case (this.value === 21):
+                case this.value === 21:
                     return Status_1.Status.TwentyOne;
                 default:
                     return Status_1.Status.Playing;
@@ -31,6 +31,16 @@ class User {
 class Player extends User {
     constructor(name) {
         super();
+        this.toString = () => {
+            return this.name;
+        };
+        this.getHand = () => {
+            let retString = "";
+            for (let card of this.cards) {
+                retString += `Card Name : ${card.toString()} Card Value : ${card.value}`;
+            }
+            return retString ? retString : "No cards yet!";
+        };
         this.name = name;
     }
 }
@@ -52,11 +62,11 @@ class Dealer extends User {
         };
         this.getStatus = () => {
             switch (true) {
-                case (this.value > 16):
+                case this.value > 16:
                     return Status_1.Status.DealerFinished;
-                case (this.value > 21):
+                case this.value > 21:
                     return Status_1.Status.Lost;
-                case (this.value === 21):
+                case this.value === 21:
                     return Status_1.Status.TwentyOne;
                 default:
                     return Status_1.Status.Playing;
@@ -67,6 +77,9 @@ class Dealer extends User {
             this.addCard(firstCard);
             if (firstCard.value in [10, 11]) {
                 console.log(`Dealer draws: ${secondCard.toString()}`);
+            }
+            else {
+                console.log("Dealer draws: Hidden card");
             }
             this.addCard(secondCard);
             return this.getStatus();

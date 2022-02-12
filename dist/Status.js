@@ -5,6 +5,6 @@ var Status;
 (function (Status) {
     Status[Status["Lost"] = 0] = "Lost";
     Status[Status["TwentyOne"] = 1] = "TwentyOne";
-    Status[Status["Playing"] = 2] = "Playing";
-    Status[Status["DealerFinished"] = 3] = "DealerFinished";
+    Status[Status["Playing"] = 0] = "Playing";
+    Status[Status["DealerFinished"] = 1] = "DealerFinished";
 })(Status = exports.Status || (exports.Status = {}));

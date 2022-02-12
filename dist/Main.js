@@ -13,6 +13,6 @@ const GameController_1 = require("./GameController");
 const Main = () => __awaiter(void 0, void 0, void 0, function* () {
     let gameController = new GameController_1.GameController();
     gameController.player = yield gameController.generateUser();
-    console.log(gameController.player);
+    gameController.startGame();
 });
 Main();

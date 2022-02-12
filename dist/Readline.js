@@ -12,4 +12,3 @@ function Readline(query) {
     }));
 }
 exports.Readline = Readline;
-// util.promisify(rl.question).bind(rl);
