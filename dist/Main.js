@@ -16,3 +16,4 @@ const Main = () => __awaiter(void 0, void 0, void 0, function* () {
     gameController.startGame();
 });
 Main();
+//# sourceMappingURL=Main.js.map

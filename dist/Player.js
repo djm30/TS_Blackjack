@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Dealer = exports.Player = void 0;
+exports.Dealer = exports.Player = exports.User = void 0;
 const Status_1 = require("./Status");
 class User {
     constructor() {
@@ -24,22 +24,25 @@ class User {
                     return Status_1.Status.Playing;
             }
         };
+        this.getHand = () => {
+            let retString = "";
+            for (let card of this.cards) {
+                retString += `Card Name : ${card.toString()} Card Value : ${card.value}\n`;
+            }
+            return retString
+                ? (retString += `\nValue: ${this.value}\n`)
+                : "No cards yet!\n";
+        };
         this.cards = [];
         this.value = 0;
     }
 }
+exports.User = User;
 class Player extends User {
     constructor(name) {
         super();
         this.toString = () => {
             return this.name;
-        };
-        this.getHand = () => {
-            let retString = "";
-            for (let card of this.cards) {
-                retString += `Card Name : ${card.toString()} Card Value : ${card.value}`;
-            }
-            return retString ? retString : "No cards yet!";
         };
         this.name = name;
     }
@@ -75,15 +78,16 @@ class Dealer extends User {
         this.initalDraw = (firstCard, secondCard) => {
             console.log(`Dealer draws: ${firstCard.toString()}`);
             this.addCard(firstCard);
-            if (firstCard.value in [10, 11]) {
-                console.log(`Dealer draws: ${secondCard.toString()}`);
-            }
-            else {
-                console.log("Dealer draws: Hidden card");
-            }
+            // if (firstCard.value in [10, 11]) {
+            //     console.log(`Dealer draws: ${secondCard.toString()}`);
+            // } else {
+            //     console.log("Dealer draws: Hidden card");
+            // }
+            console.log(`Dealer draws: ${secondCard.toString()}\n`);
             this.addCard(secondCard);
             return this.getStatus();
         };
     }
 }
 exports.Dealer = Dealer;
+//# sourceMappingURL=Player.js.map

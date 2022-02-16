@@ -12,3 +12,4 @@ function Readline(query) {
     }));
 }
 exports.Readline = Readline;
+//# sourceMappingURL=Readline.js.map

@@ -1,7 +1,7 @@
 import { Card } from "./Deck";
 import { Status } from "./Status";
 
-abstract class User {
+export abstract class User {
     public cards: Card[];
     public value: number;
     constructor() {
@@ -30,6 +30,17 @@ abstract class User {
                 return Status.Playing;
         }
     };
+    public getHand = (): string => {
+        let retString: string = "";
+        for (let card of this.cards) {
+            retString += `Card Name : ${card.toString()} Card Value : ${
+                card.value
+            }\n`;
+        }
+        return retString
+            ? (retString += `\nValue: ${this.value}\n`)
+            : "No cards yet!\n";
+    };
 }
 
 export class Player extends User {
@@ -40,16 +51,6 @@ export class Player extends User {
     }
     public toString = (): string => {
         return this.name;
-    };
-
-    public getHand = (): string => {
-        let retString: string = "";
-        for (let card of this.cards) {
-            retString += `Card Name : ${card.toString()} Card Value : ${
-                card.value
-            }`;
-        }
-        return retString ? retString : "No cards yet!";
     };
 }
 
@@ -87,11 +88,12 @@ export class Dealer extends User {
     public initalDraw = (firstCard: Card, secondCard: Card): Status => {
         console.log(`Dealer draws: ${firstCard.toString()}`);
         this.addCard(firstCard);
-        if (firstCard.value in [10, 11]) {
-            console.log(`Dealer draws: ${secondCard.toString()}`);
-        } else {
-            console.log("Dealer draws: Hidden card");
-        }
+        // if (firstCard.value in [10, 11]) {
+        //     console.log(`Dealer draws: ${secondCard.toString()}`);
+        // } else {
+        //     console.log("Dealer draws: Hidden card");
+        // }
+        console.log(`Dealer draws: ${secondCard.toString()}\n`);
         this.addCard(secondCard);
         return this.getStatus();
     };
