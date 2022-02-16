@@ -33,6 +33,9 @@ class User {
                 ? (retString += `\nValue: ${this.value}\n`)
                 : "No cards yet!\n";
         };
+        this.initalDraw = (firstCard, secondCard) => {
+            return Status_1.Status.Lost;
+        };
         this.cards = [];
         this.value = 0;
     }
@@ -43,6 +46,13 @@ class Player extends User {
         super();
         this.toString = () => {
             return this.name;
+        };
+        this.initalDraw = (firstCard, secondCard) => {
+            console.log(`${this.name} draws: ${firstCard.toString()}`);
+            this.addCard(firstCard);
+            console.log(`${this.name} draws: ${secondCard.toString()}\n`);
+            this.addCard(secondCard);
+            return this.getStatus();
         };
         this.name = name;
     }
@@ -78,12 +88,13 @@ class Dealer extends User {
         this.initalDraw = (firstCard, secondCard) => {
             console.log(`Dealer draws: ${firstCard.toString()}`);
             this.addCard(firstCard);
-            // if (firstCard.value in [10, 11]) {
-            //     console.log(`Dealer draws: ${secondCard.toString()}`);
-            // } else {
-            //     console.log("Dealer draws: Hidden card");
-            // }
-            console.log(`Dealer draws: ${secondCard.toString()}\n`);
+            if (firstCard.value in [10, 11]) {
+                console.log(`Dealer draws: ${secondCard.toString()}`);
+            }
+            else {
+                console.log("Dealer draws: Hidden card");
+            }
+            // console.log(`Dealer draws: ${secondCard.toString()}\n`);
             this.addCard(secondCard);
             return this.getStatus();
         };

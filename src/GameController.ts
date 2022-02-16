@@ -4,6 +4,7 @@ import { Status } from "./Status";
 import { Deck, Card } from "./Deck";
 import { cfg } from "./Config";
 import { Readline } from "./Readline";
+import { wait } from "./Wait"
 
 //Deck declaration
 let deckSize = cfg.deckSize;
@@ -13,18 +14,23 @@ let MainMenu: Menu = new Menu([
     "Hit",
     "Stand",
     "Check hand",
-    "Check Dealer Hand",
     "Quit",
 ]);
+
+
 export class GameController {
-    public player: Player;
-    public dealer: Dealer;
+    private player: Player;
+    private dealer: Dealer;
+    private winner: User;
     constructor() {
-        this.dealer = new Dealer();
-        this.player = new Player("Default");
     }
 
-    public generateUser = async (): Promise<Player> => {
+    public async setUp() {
+        this.dealer = new Dealer();
+        this.player = await this.generateUser();
+    }
+
+    private generateUser = async (): Promise<Player> => {
         try {
             let answer = await Readline("What is your name?\n");
             return new Player(answer);
@@ -34,100 +40,94 @@ export class GameController {
         }
     };
 
-    public startGame = async (): Promise<void> => {
-        //Welcome message
-        console.log(`Welcome, ${this.player.toString()}\n`);
 
-        //Method to add cards in game
-        const drawAndAddCard = (user: User): Status => {
-            let drawnCard: Card = deck.drawCard();
-            console.log(`Drew a: ${drawnCard}`);
-            return user.addCard(drawnCard);
-        };
-
-        //Method to check win
-        const checkWinOrLost = (user: User): void => {
-            console.log(user.getStatus());
-            if (user.getStatus() == Status.Lost) {
-                losingUser = user;
-                playGame = false;
-            } else if (user.getStatus() == Status.TwentyOne) {
-                winningUser = user;
-                playGame = false;
-            }
-        };
-
-        //Check win
-        let winningUser: User | undefined;
-        let losingUser: User | undefined;
-
-        //Player initial card draw
-        console.log("Players go");
-        let card1: Card = deck.drawCard(),
-            card2: Card = deck.drawCard();
-        console.log(`Drew a ${card1}\nDrew a ${card2}\n`);
-        this.player.addCard(card1);
-        this.player.addCard(card2);
+    private initalCardDraws = (): void => {
+        console.log(`Welcome ${this.player.toString()}!`)
 
         //Dealer initial draw
-        let dealerStatus = this.dealer.initalDraw(
-            deck.drawCard(), //First Card
-            deck.drawCard() //Second Card
-        );
+        console.log("Dealers turn to go")
+        this.dealer.initalDraw(deck.drawCard(), deck.drawCard())
 
-        let playGame: boolean = true;
+        console.log("\nPlayers turn to draw")
+        this.player.initalDraw(deck.drawCard(), deck.drawCard())
+        console.log(`Value: ${this.player.value}\n`)
 
-        //Main game loop
-        while (playGame) {
-            //Player choice loop
-            let playerDone: boolean = false;
-            while (!playerDone) {
-                switch (await MainMenu.display()) {
-                    case 1:
-                        drawAndAddCard(this.player);
-                        checkWinOrLost(this.player);
-                        playerDone = true;
-                        break;
+    }
 
-                    case 2:
-                    //Logic if player stops drawing cards - Dealer needs to keep drawing until over 16
-
-                    case 3:
-                        console.log(this.player.getHand());
-                        break;
-                    case 4:
-                        console.log("Dealers hand:");
-                        console.log(this.dealer.getHand());
-                        break;
-                    case 5:
-                        console.log("Bye bye");
-                        process.exit(0);
-                }
+    private playerLoop = async (): Promise<Status> => {
+        let playerDone: boolean = false;
+        while (!playerDone) {
+            switch (await MainMenu.display()) {
+                case 1:
+                    //Add card
+                    let cardToAdd = deck.drawCard();
+                    this.player.addCard(cardToAdd);
+                    console.log(`\n${this.player.name} draws: ${cardToAdd.toString()}`)
+                    console.log(`Value: ${this.player.value}\n`)
+                    break;
+                case 2:
+                    //Stand
+                    console.log("Current hand:")
+                    console.log(this.player.getHand())
+                    playerDone = true;
+                case 3:
+                    //Player views own cards
+                    console.log(this.player.getHand());
+                    break;
+                case 4:
+                    console.log("Bye bye");
+                    process.exit(0);
             }
-            //Checking if dealer can go or not
-            if (!winningUser && !losingUser) {
-                if (this.dealer.getStatus() !== Status.DealerFinished) {
-                    console.log("Dealers turn!");
-                    dealerStatus = drawAndAddCard(this.dealer);
-                } else {
-                    console.log("Dealer is standing");
-                }
-                checkWinOrLost(this.dealer);
+            if (this.player.value >= 21) {
+                playerDone = true;
             }
-            //Check win conditions here
         }
-        if (winningUser) {
-            if (winningUser === this.player) {
-                console.log("Player One, Congrats!");
-            } else {
-                console.log("Dealer won, better luck next time!");
+        return this.player.getStatus()
+    }
+
+    private dealerLoop = async (): Promise<Status> => {
+        //Print dealer initial hand
+        console.log("Dealer is going now!\nDealers hand:");
+        console.log(this.dealer.getHand())
+
+        let dealerDone: boolean = false;
+        while (!dealerDone) {
+            await wait(2000);
+            let cardToAdd = deck.drawCard();
+            let status = this.dealer.addCard(cardToAdd);
+            console.log(`Dealer drew: ${cardToAdd.toString()}`)
+            console.log(`Value: ${this.dealer.value}\n`)
+
+            if (status !== Status.Playing) {
+                dealerDone = true
             }
+        }
+        console.log("Dealer finished!")
+        return this.dealer.getStatus()
+    }
+
+    private checkPlayerWin = (player: Player): string => {
+        if (player.getStatus() === Status.Lost) {
+            return `Sorry, ${player.name}, better luck next time!`;
+        }
+        return ""
+    }
+
+    private finalComparison = (): string => {
+        return "Hi there gamers!"
+    }
+
+    public startGame = async (): Promise<void> => {
+        this.initalCardDraws();
+        console.log(await this.playerLoop())
+        let message = this.checkPlayerWin(this.player)
+        if (!message) {
+            await this.dealerLoop()
+            console.log(this.finalComparison())
         } else {
-            if (losingUser === this.player) {
-                console.log("You lost, Better luck next time!");
-            } else {
-                console.log("Dealer lost, Lets go!");
-            }
+            console.log(message);
         }
-    };
+        await Readline("Press enter to exit...");
+    }
+
 }

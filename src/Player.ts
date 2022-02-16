@@ -33,13 +33,16 @@ export abstract class User {
     public getHand = (): string => {
         let retString: string = "";
         for (let card of this.cards) {
-            retString += `Card Name : ${card.toString()} Card Value : ${
-                card.value
-            }\n`;
+            retString += `Card Name : ${card.toString()} Card Value : ${card.value
+                }\n`;
         }
         return retString
             ? (retString += `\nValue: ${this.value}\n`)
             : "No cards yet!\n";
+    };
+
+    public initalDraw = (firstCard: Card, secondCard: Card): Status => {
+        return Status.Lost;
     };
 }
 
@@ -51,6 +54,14 @@ export class Player extends User {
     }
     public toString = (): string => {
         return this.name;
+    };
+
+    public initalDraw = (firstCard: Card, secondCard: Card): Status => {
+        console.log(`${this.name} draws: ${firstCard.toString()}`);
+        this.addCard(firstCard);
+        console.log(`${this.name} draws: ${secondCard.toString()}\n`);
+        this.addCard(secondCard);
+        return this.getStatus();
     };
 }
 
@@ -88,12 +99,12 @@ export class Dealer extends User {
     public initalDraw = (firstCard: Card, secondCard: Card): Status => {
         console.log(`Dealer draws: ${firstCard.toString()}`);
         this.addCard(firstCard);
-        // if (firstCard.value in [10, 11]) {
-        //     console.log(`Dealer draws: ${secondCard.toString()}`);
-        // } else {
-        //     console.log("Dealer draws: Hidden card");
-        // }
-        console.log(`Dealer draws: ${secondCard.toString()}\n`);
+        if (firstCard.value in [10, 11]) {
+            console.log(`Dealer draws: ${secondCard.toString()}`);
+        } else {
+            console.log("Dealer draws: Hidden card");
+        }
+        // console.log(`Dealer draws: ${secondCard.toString()}\n`);
         this.addCard(secondCard);
         return this.getStatus();
     };

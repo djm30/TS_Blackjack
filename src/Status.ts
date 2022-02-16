@@ -1,6 +1,6 @@
 export enum Status {
-    Lost,
-    TwentyOne,
-    Playing,
-    DealerFinished,
+    Lost = "Lost",
+    TwentyOne = "TwentyOne",
+    Playing = "Playing",
+    DealerFinished = "DealerFinished",
 }

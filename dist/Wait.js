@@ -9,11 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const GameController_1 = require("./GameController");
-const Main = () => __awaiter(void 0, void 0, void 0, function* () {
-    let gameController = new GameController_1.GameController();
-    yield gameController.setUp();
-    gameController.startGame();
+exports.wait = void 0;
+let wait = (duration) => __awaiter(void 0, void 0, void 0, function* () {
+    return new Promise(resolve => {
+        setTimeout(() => resolve(), duration);
+    });
 });
-Main();
-//# sourceMappingURL=Main.js.map
+exports.wait = wait;
+//# sourceMappingURL=Wait.js.map
